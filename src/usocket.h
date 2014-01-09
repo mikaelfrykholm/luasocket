@@ -30,6 +30,8 @@
 /* TCP options (nagle algorithm disable) */
 #include <netinet/tcp.h>
 #include <net/if.h>
+/* SCTP support */
+#include <netinet/sctp.h>
 
 #ifndef SO_REUSEPORT
 #define SO_REUSEPORT SO_REUSEADDR

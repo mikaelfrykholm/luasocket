@@ -356,7 +356,8 @@ static int meth_settimeout(lua_State *L)
 \*-------------------------------------------------------------------------*/
 static int tcp_create(lua_State *L, int family) {
     t_socket sock;
-    const char *err = inet_trycreate(&sock, family, SOCK_STREAM);
+    /*const char *err = inet_trycreate(&sock, family, SOCK_STREAM);*/
+    const char *err = socket_strerror(socket_create(&sock, family, SOCK_STREAM, IPPROTO_SCTP));
     /* try to allocate a system socket */
     if (!err) {
         /* allocate tcp object */

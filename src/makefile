@@ -18,10 +18,10 @@ PLAT?=linux
 
 # LUAV: 5.1 5.2
 # lua version to build against
-LUAV?=5.1
+LUAV?=5.2
 
 # MYCFLAGS: to be set by user if needed
-MYCFLAGS=
+MYCFLAGS=-lsctp
 
 # MYLDFLAGS: to be set by user if needed
 MYLDFLAGS=
@@ -164,8 +164,8 @@ DEF_linux=-DLUASOCKET_$(DEBUG) -DLUA_$(COMPAT)_MODULE \
 	-DUNIX_API='__attribute__((visibility("default")))' \
 	-DMIME_API='__attribute__((visibility("default")))'
 CFLAGS_linux= -I$(LUAINC) $(DEF) -pedantic -Wall -Wshadow -Wextra \
-	-Wimplicit -O2 -ggdb3 -fpic -fvisibility=hidden
-LDFLAGS_linux=-O -shared -fpic -o 
+	-Wimplicit -O2 -ggdb3 -fpic -fvisibility=hidden -lsctp
+LDFLAGS_linux=-O -shared -fpic -lsctp -o 
 LD_linux=gcc
 SOCKET_linux=usocket.o
 

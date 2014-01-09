@@ -206,7 +206,9 @@ int socket_send(p_socket ps, const char *data, size_t count,
     if (*ps == SOCKET_INVALID) return IO_CLOSED;
     /* loop until we send something or we give up on error */
     for ( ;; ) {
-        long put = (long) send(*ps, data, count, 0);
+         long put = sctp_sendmsg( *ps, data, count,
+                       NULL, 0, 0, 0, 0, 0, 0 );
+        /*long put = (long) send(*ps, data, count, 0);*/
         /* if we sent anything, we are done */
         if (put >= 0) {
             *sent = put;
@@ -254,11 +256,15 @@ int socket_sendto(p_socket ps, const char *data, size_t count, size_t *sent,
 * Receive with timeout
 \*-------------------------------------------------------------------------*/
 int socket_recv(p_socket ps, char *data, size_t count, size_t *got, p_timeout tm) {
-    int err;
+    int err, flags;
+    struct sctp_sndrcvinfo sndrcvinfo;
+
     *got = 0;
     if (*ps == SOCKET_INVALID) return IO_CLOSED;
     for ( ;; ) {
-        long taken = (long) recv(*ps, data, count, 0);
+
+        /*long taken = (long) recv(*ps, data, count, 0);*/
+        long taken = (long) sctp_recvmsg(*ps, data, count, NULL, 0, &sndrcvinfo, &flags);
         if (taken > 0) {
             *got = taken;
             return IO_DONE;
@@ -271,17 +277,23 @@ int socket_recv(p_socket ps, char *data, size_t count, size_t *got, p_timeout tm
     }
     return IO_UNKNOWN;
 }
-
+/* in = sctp_recvmsg( connSock, (void *)buffer, sizeof(buffer),
+                        (struct sockaddr *)NULL, 0, &sndrcvinfo, &flags );
+      printf(" Data : %s\n", buffer);
+*/
 /*-------------------------------------------------------------------------*\
 * Recvfrom with timeout
 \*-------------------------------------------------------------------------*/
 int socket_recvfrom(p_socket ps, char *data, size_t count, size_t *got, 
         SA *addr, socklen_t *len, p_timeout tm) {
-    int err;
+    int err, flags;
+    struct sctp_sndrcvinfo sndrcvinfo;
+
     *got = 0;
     if (*ps == SOCKET_INVALID) return IO_CLOSED;
     for ( ;; ) {
-        long taken = (long) recvfrom(*ps, data, count, 0, addr, len);
+        /*long taken = (long) recvfrom(*ps, data, count, 0, addr, len);*/
+        long taken = (long) sctp_recvmsg(*ps, data, count, NULL, 0, &sndrcvinfo, &flags);
         if (taken > 0) {
             *got = taken;
             return IO_DONE;
@@ -312,7 +324,9 @@ int socket_write(p_socket ps, const char *data, size_t count,
     if (*ps == SOCKET_INVALID) return IO_CLOSED;
     /* loop until we send something or we give up on error */
     for ( ;; ) {
-        long put = (long) write(*ps, data, count);
+        long put = sctp_sendmsg( *ps, data, count,
+                       NULL, 0, 0, 0, 0, 0, 0 );
+        /*long put = (long) write(*ps, data, count);*/
         /* if we sent anything, we are done */
         if (put >= 0) {
             *sent = put;
@@ -337,11 +351,15 @@ int socket_write(p_socket ps, const char *data, size_t count,
 * See note for socket_write
 \*-------------------------------------------------------------------------*/
 int socket_read(p_socket ps, char *data, size_t count, size_t *got, p_timeout tm) {
-    int err;
+    int err, flags;
+    struct sctp_sndrcvinfo sndrcvinfo;
+
     *got = 0;
     if (*ps == SOCKET_INVALID) return IO_CLOSED;
     for ( ;; ) {
-        long taken = (long) read(*ps, data, count);
+        long taken = (long) sctp_recvmsg(*ps, data, count, NULL, 0, &sndrcvinfo, &flags);
+
+/*        long taken = (long) read(*ps, data, count);*/
         if (taken > 0) {
             *got = taken;
             return IO_DONE;
